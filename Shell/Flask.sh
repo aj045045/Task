@@ -6,6 +6,7 @@ from mongoengine import connect
 from app.config import app
 import os
 from dotenv import load_dotenv
+from flask import render_template
 
 variables_to_remove = ['FLASK_ENV', 'DB_NAME', 'DB_URL','DB_PORT','SECRET_KEY']
 for var in variables_to_remove:
@@ -14,7 +15,8 @@ for var in variables_to_remove:
 load_dotenv()
 
 def greeting():
-    return f"<h1>This is a Flask {os.getenv('FLASK_ENV')} Server</h1>"
+    return render_template('index.html',flask_page=os.getenv('FLASK_ENV'))
+
 
 app.add_url_rule("/", "greeting", greeting, methods=['GET'])
 
@@ -28,12 +30,25 @@ if __name__ == "__main__":
     app.run(debug=True)
 EOF
 
+cat > "templates/index.html" <<EOF
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ flask_page }}</title>
+</head>
+<body>
+    <h1>This is a Flask {{ flask_page }} server</h1>
+</body>
+</html>
+EOF
 
 cat > "app/config.py" <<EOF
 from flask import Flask, jsonify, request
 from flask_cors import CORS
 
-app = Flask(__name__)
+app = Flask(__name__,template_folder='../templates')
 
 CORS(app)
 
@@ -130,14 +145,14 @@ Init() {
     deactivate
 
     # Create the folders
-    mkdir -p app/controller app/model app/repository app/service
+    mkdir -p app/controller app/model app/repository app/service templates
     if [ $? -ne 0 ]; then
         echo "Failed to create project folders"
         exit 1
     fi
 
     # Create files
-    file_array=(".env" ".gitignore" "main.py" "app/__init__.py" "app/config.py" "app/controller/__init__.py" "app/model/__init__.py" "app/repository/__init__.py" "app/service/__init__.py")
+    file_array=(".env" ".gitignore" "main.py" "app/__init__.py" "app/config.py" "app/controller/__init__.py" "app/model/__init__.py" "app/repository/__init__.py" "app/service/__init__.py" "templates/index.html")
     for file in "${file_array[@]}"; do
         touch "$file";
     done
