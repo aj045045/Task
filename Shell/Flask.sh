@@ -142,6 +142,7 @@ Init() {
         done  
     fi
     ExportEnv
+    export PYTHONPYCACHEPREFIX=/.build/
     deactivate
 
     # Create the folders
