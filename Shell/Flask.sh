@@ -180,6 +180,9 @@ ExportEnv() {
 #REVIEW - Function to run the server
 RunPythonServer() {
     trap RemovePycache SIGINT
+    if [ -z "${PYTHONPYCACHEPREFIX}" ]; then
+        export PYTHONPYCACHEPREFIX=".build/"
+    fi
     python main.py
 }
 
